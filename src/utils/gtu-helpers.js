@@ -36,10 +36,16 @@ export function summarizeInstruments(orders) {
   const summary = {};
   let total = 0;
 
+  // Defensive check: ensure orders is an array
+  if (!Array.isArray(orders)) {
+    console.warn('summarizeInstruments: orders is not an array:', orders);
+    return { summary, total };
+  }
+
   orders.forEach(order => {
-    if (order.line_items) {
+    if (order && order.line_items && Array.isArray(order.line_items)) {
       order.line_items.forEach(item => {
-        if (item.name && item.name.toLowerCase().includes('instrument')) {
+        if (item && item.name && item.name.toLowerCase().includes('instrument')) {
           summary[item.name] = (summary[item.name] || 0) + (item.quantity || 0);
           total += item.quantity || 0;
         }
@@ -78,9 +84,16 @@ export async function getEnrolledStudents(eventId, groupId) {
         const wooUrl = buildApiUrl(API_CONFIG.ENDPOINTS.WOOCOMMERCE_ORDERS, { eventId });
         const ordersRes = await fetch(wooUrl);
         const orders = await ordersRes.json();
+        
+        // Defensive check: ensure orders is an array
+        if (!Array.isArray(orders)) {
+          console.warn('getEnrolledStudents: orders is not an array:', orders);
+          return [];
+        }
+        
         return orders.map(order => ({
-          name: `${order.billing?.first_name || ''} ${order.billing?.last_name || ''}`.trim(),
-          email: order.billing?.email || '',
+          name: `${order?.billing?.first_name || ''} ${order?.billing?.last_name || ''}`.trim(),
+          email: order?.billing?.email || '',
           source: "WooCommerce"
         }));
       } catch (fallbackErr) {
@@ -101,7 +114,14 @@ export async function getDangerZoneStatus(eventId) {
     const dangerUrl = buildApiUrl(API_CONFIG.ENDPOINTS.DANGER_ZONE);
     const res = await fetch(dangerUrl);
     const data = await res.json();
-    const match = data.find(d => d.event_id === eventId);
+    
+    // Defensive check: ensure data is an array
+    if (!Array.isArray(data)) {
+      console.warn('getDangerZoneStatus: data is not an array:', data);
+      return "Unknown";
+    }
+    
+    const match = data.find(d => d && d.event_id === eventId);
     return match ? match.status : "Unknown";
   } catch (err) {
     console.error("Error fetching danger zone status:", err);
@@ -116,8 +136,18 @@ export async function getDangerZoneStatus(eventId) {
  * @returns {Array} Students with merged license data
  */
 export function mergeLicenseData(students, licenses) {
+  // Defensive checks: ensure both parameters are arrays
+  if (!Array.isArray(students)) {
+    console.warn('mergeLicenseData: students is not an array:', students);
+    return [];
+  }
+  if (!Array.isArray(licenses)) {
+    console.warn('mergeLicenseData: licenses is not an array:', licenses);
+    return students;
+  }
+
   return students.map(student => {
-    const license = licenses.find(l => l.email === student.email);
+    const license = licenses.find(l => l && l.email === student?.email);
     return {
       ...student,
       license_type: license?.type || "N/A"

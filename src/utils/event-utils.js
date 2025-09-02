@@ -31,11 +31,23 @@ export function summarizeInstruments(orders) {
   const summary = {};
   let total = 0;
 
+  // Defensive check: ensure orders is an array
+  if (!Array.isArray(orders)) {
+    console.warn('summarizeInstruments: orders is not an array:', orders);
+    return { summary, total };
+  }
+
   orders.forEach(order => {
-    order.items.forEach(item => {
-      summary[item.name] = (summary[item.name] || 0) + item.quantity;
-      total += item.quantity;
-    });
+    // Check for both line_items (gtu-helpers format) and items (event-utils format)
+    const items = order && (order.line_items || order.items);
+    if (items && Array.isArray(items)) {
+      items.forEach(item => {
+        if (item && item.name) {
+          summary[item.name] = (summary[item.name] || 0) + (item.quantity || 0);
+          total += item.quantity || 0;
+        }
+      });
+    }
   });
 
   return { summary, total };
@@ -88,8 +100,18 @@ export function getEnrolledStudents(students) {
  * @returns {Array} - Merged data
  */
 export function mergeLicenseData(events, licenses) {
+  // Defensive checks: ensure both parameters are arrays
+  if (!Array.isArray(events)) {
+    console.warn('mergeLicenseData: events is not an array:', events);
+    return [];
+  }
+  if (!Array.isArray(licenses)) {
+    console.warn('mergeLicenseData: licenses is not an array:', licenses);
+    return events;
+  }
+
   return events.map(event => {
-    const license = licenses.find(lic => lic.eventId === event.id);
+    const license = licenses.find(lic => lic && lic.eventId === event?.id);
     return { ...event, license };
   });
 }

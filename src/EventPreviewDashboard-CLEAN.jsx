@@ -59,17 +59,24 @@ export default function EventPreviewDashboard() {
       { input: "Random Training Name", expected: "Uncategorized" }
     ];
 
-    testCases.forEach(testCase => {
-      const result = normalizeTrainingType(testCase.input);
-      const pass = result === testCase.expected;
-      console.log(`"${testCase.input}" → "${result}" (${pass ? '✅' : '❌'})`);
-      results.push({
-        test: `normalizeTrainingType("${testCase.input}")`,
-        expected: `"${testCase.expected}"`,
-        actual: `"${result}"`,
-        pass
+    // Defensive check: ensure testCases is an array
+    if (Array.isArray(testCases)) {
+      testCases.forEach(testCase => {
+        if (testCase && testCase.input && testCase.expected) {
+          const result = normalizeTrainingType(testCase.input);
+          const pass = result === testCase.expected;
+          console.log(`"${testCase.input}" → "${result}" (${pass ? '✅' : '❌'})`);
+          results.push({
+            test: `normalizeTrainingType("${testCase.input}")`,
+            expected: `"${testCase.expected}"`,
+            actual: `"${result}"`,
+            pass
+          });
+        }
       });
-    });
+    } else {
+      console.warn('testCases is not an array:', testCases);
+    }
 
     console.log("\n🎉 Helper function tests complete!");
     setTestResults(results);
@@ -84,21 +91,21 @@ export default function EventPreviewDashboard() {
       <div style={{ marginBottom: '40px', padding: '20px', border: '2px solid #ddd', borderRadius: '8px' }}>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '15px' }}>🧪 Test Results</h2>
         <div style={{ fontFamily: 'monospace', fontSize: '14px' }}>
-          {testResults.map((result, index) => (
+          {Array.isArray(testResults) ? testResults.map((result, index) => (
             <div key={index} style={{
               marginBottom: '15px',
               padding: '10px',
-              backgroundColor: result.pass ? '#d4edda' : '#f8d7da',
-              border: `1px solid ${result.pass ? '#c3e6cb' : '#f5c6cb'}`,
+              backgroundColor: result?.pass ? '#d4edda' : '#f8d7da',
+              border: `1px solid ${result?.pass ? '#c3e6cb' : '#f5c6cb'}`,
               borderRadius: '4px'
             }}>
               <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                {result.pass ? '✅' : '❌'} {result.test}
+                {result?.pass ? '✅' : '❌'} {result?.test || 'Unknown test'}
               </div>
-              <div>Expected: {result.expected}</div>
-              <div>Actual: {result.actual}</div>
+              <div>Expected: {result?.expected || 'N/A'}</div>
+              <div>Actual: {result?.actual || 'N/A'}</div>
             </div>
-          ))}
+          )) : <div>No test results available</div>}
         </div>
         <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
           <strong>📝 Instructions:</strong> Open your browser's Developer Tools (F12) and check the Console tab for detailed test output!

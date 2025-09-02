@@ -1,0 +1,45 @@
+[
+  {
+    "id": "event-1",
+    "title": "Hybrid Essential Pilot",
+    "start_date": "2024-03-15T09:00:00Z",
+    "attendees": 25,
+    "max_attendees": 30,
+    "orders": [
+      {
+        "line_items": [
+          { "name": "Instrument GT-1", "quantity": 3 },
+          { "name": "Training Event", "quantity": 1 }
+        ]
+      },
+      {
+        "line_items": [
+          { "name": "Instrument GT-2", "quantity": 2 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "event-2", 
+    "title": "Advanced Graston Training",
+    "start_date": "2024-04-20T10:00:00Z",
+    "attendees": 18,
+    "max_attendees": 20,
+    "orders": [
+      {
+        "line_items": [
+          { "name": "Instrument GT-3", "quantity": 1 },
+          { "name": "Training Manual", "quantity": 1 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "event-3",
+    "title": "Virtual Training Session", 
+    "start_date": "2024-05-10T14:00:00Z",
+    "attendees": 45,
+    "max_attendees": 50,
+    "orders": []
+  }
+]
