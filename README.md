@@ -128,4 +128,4 @@ This project is licensed under the MIT License.
 
 ---
 
-**Made with ❤️ and a craving for spicy chicken nugs**
+## Made with ❤️ and a craving for spicy chicken nugs
