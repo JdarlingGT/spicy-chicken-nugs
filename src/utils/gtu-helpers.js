@@ -1,6 +1,8 @@
 // gtu-helpers.js
 // Helper functions for Graston event dashboard
 
+import { buildApiUrl, API_CONFIG, fetchEventAttendees } from './api-config.js';
+
 /**
  * Normalize training type based on title keywords
  * @param {string} title - The event title
@@ -49,42 +51,55 @@ export function summarizeInstruments(orders) {
 }
 
 /**
- * Get enrolled students for an event/group
+ * Get enrolled students for an event/group using dynamic API endpoints
  * @param {string|number} eventId - Event ID
  * @param {string|number} groupId - Group ID for LearnDash
  * @returns {Promise<Array>} Array of enrolled students
  */
 export async function getEnrolledStudents(eventId, groupId) {
   try {
-    // Try LearnDash API first
-    const res = await fetch(`/wp-json/ldlms/v2/groups/${groupId}/users`);
-    if (!res.ok) throw new Error("LearnDash API error");
-    return await res.json();
-  } catch (err) {
-    // Fallback to WooCommerce orders
+    // First try the new attendees endpoint with dynamic ID replacement
+    console.log(`🔍 Fetching attendees for event ID: ${eventId}`);
+    return await fetchEventAttendees(eventId);
+  } catch (attendeesErr) {
+    console.log('🔄 Attendees endpoint failed, trying LearnDash API...');
+
     try {
-      const ordersRes = await fetch(`/orders?event_id=${eventId}`);
-      const orders = await ordersRes.json();
-      return orders.map(order => ({
-        name: `${order.billing?.first_name || ''} ${order.billing?.last_name || ''}`.trim(),
-        email: order.billing?.email || '',
-        source: "WooCommerce"
-      }));
-    } catch (fallbackErr) {
-      console.error("Error fetching enrolled students:", fallbackErr);
-      return [];
+      // Try LearnDash API with dynamic URL building
+      const learndashUrl = buildApiUrl(API_CONFIG.ENDPOINTS.LEARNDASH_USERS, { groupId });
+      const res = await fetch(learndashUrl);
+      if (!res.ok) throw new Error("LearnDash API error");
+      return await res.json();
+    } catch (learndashErr) {
+      console.log('🔄 LearnDash failed, trying WooCommerce fallback...');
+
+      // Fallback to WooCommerce orders with dynamic URL
+      try {
+        const wooUrl = buildApiUrl(API_CONFIG.ENDPOINTS.WOOCOMMERCE_ORDERS, { eventId });
+        const ordersRes = await fetch(wooUrl);
+        const orders = await ordersRes.json();
+        return orders.map(order => ({
+          name: `${order.billing?.first_name || ''} ${order.billing?.last_name || ''}`.trim(),
+          email: order.billing?.email || '',
+          source: "WooCommerce"
+        }));
+      } catch (fallbackErr) {
+        console.error("❌ All enrollment data sources failed:", fallbackErr);
+        return [];
+      }
     }
   }
 }
 
 /**
- * Get danger zone status for an event
+ * Get danger zone status for an event using dynamic API
  * @param {string|number} eventId - Event ID
  * @returns {Promise<string>} Danger zone status
  */
 export async function getDangerZoneStatus(eventId) {
   try {
-    const res = await fetch(`/events/danger-zone`);
+    const dangerUrl = buildApiUrl(API_CONFIG.ENDPOINTS.DANGER_ZONE);
+    const res = await fetch(dangerUrl);
     const data = await res.json();
     const match = data.find(d => d.event_id === eventId);
     return match ? match.status : "Unknown";

@@ -1,18 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
   normalizeTrainingType,
-  summarizeInstruments,
-  formatEventDate,
-  calculateCapacityMetrics,
-  getDangerZoneStatus,
-  getEnrolledStudents,
-  mergeLicenseData
-} from "./utils/event-utils.js";
-import {
-  buildApiUrl,
-  API_CONFIG,
-  demonstrateApiUsage
-} from "./utils/api-config.js";
+  summarizeInstruments
+} from "./utils/gtu-helpers.js";
 
 export default function EventPreviewDashboard() {
   const [testResults, setTestResults] = useState([]);
@@ -82,29 +72,6 @@ export default function EventPreviewDashboard() {
     });
 
     console.log("\n🎉 Helper function tests complete!");
-
-    // 🔗 Test Dynamic API Configuration
-    console.log("\n🔗 Testing Dynamic API Configuration:");
-    console.log("✅ Confirming Dynamic ID Format in Attendees Endpoint");
-
-    demonstrateApiUsage();
-
-    // Test the specific pattern you mentioned
-    const eventId = '12345';
-    const attendeesUrl = buildApiUrl(API_CONFIG.ENDPOINTS.EVENT_ATTENDEES, { id: eventId });
-    console.log(`\n🎯 Testing: ${API_CONFIG.ENDPOINTS.EVENT_ATTENDEES}`);
-    console.log(`📝 Pattern: /gted/v1/events/{id}/attendees`);
-    console.log(`🔧 Logic: buildApiUrl(endpoint, {id: "${eventId}"})`);
-    console.log(`✅ Result: ${attendeesUrl}`);
-
-    // Add this test to the results
-    results.push({
-      test: 'Dynamic API: EVENT_ATTENDEES endpoint',
-      expected: `${API_CONFIG.BASE_URL}/gted/v1/events/${eventId}/attendees`,
-      actual: attendeesUrl,
-      pass: attendeesUrl === `${API_CONFIG.BASE_URL}/gted/v1/events/${eventId}/attendees`
-    });
-
     setTestResults(results);
   }, []);
 
@@ -135,14 +102,6 @@ export default function EventPreviewDashboard() {
         </div>
         <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
           <strong>📝 Instructions:</strong> Open your browser's Developer Tools (F12) and check the Console tab for detailed test output!
-        </div>
-        <div style={{ marginTop: '15px', padding: '15px', backgroundColor: '#e7f3ff', borderRadius: '4px', border: '1px solid #007bff' }}>
-          <strong>🔗 Dynamic API Configuration Confirmed!</strong>
-          <div style={{ marginTop: '10px', fontFamily: 'monospace', fontSize: '13px' }}>
-            <div>✅ <code>/gted/v1/events/&#123;id&#125;/attendees</code></div>
-            <div>✅ Frontend logic: <code>buildApiUrl(endpoint, &#123;id: eventId&#125;)</code></div>
-            <div>✅ Result: <code>/gted/v1/events/12345/attendees</code></div>
-          </div>
         </div>
       </div>
 
