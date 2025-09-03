@@ -1,25 +1,29 @@
-# 🔥 Spicy Chicken Nugs
+# 🔥 Spicy Chicken Nugs - Graston Event Dashboard
 
-## A deliciously efficient Graston Event Dashboard
+## A deliciously efficient, production-ready Graston Event Dashboard
 
 ### 🚀 Overview
 
-This React-based dashboard provides comprehensive event intelligence for Graston training programs. Built with modern web technologies, it offers real-time enrollment tracking, training type categorization, and capacity management.
+This React-based dashboard provides comprehensive event intelligence for Graston training programs. Built with modern web technologies, it offers real-time enrollment tracking, interactive analytics, robust error handling, and comprehensive testing coverage.
 
 ### ✨ Features
 
-- 📊 **Event Intelligence Dashboard** - Real-time event monitoring
-- 🎯 **Training Type Classification** - Automatic categorization (Essential, Advanced, Virtual, Specialty)
+- 📊 **Enhanced Event Dashboard** - Real-time event monitoring with analytics
+- 🎯 **Interactive Analytics** - Charts and data visualization with Recharts
 - 👥 **Enrollment Tracking** - Live capacity metrics and student counts
-- ⚠️ **Danger Zone Status** - Event risk assessment
+- 🛡️ **Robust Error Handling** - Global error boundaries with retry functionality
+- 🧪 **Comprehensive Testing** - Full test coverage with Jest and React Testing Library
 - 📱 **Responsive Design** - Modern UI with Tailwind CSS
-- 🔄 **Multi-Source Data** - LearnDash and WooCommerce integration
+- 🔄 **Loading States** - Smooth user experience with loading indicators
+- 📤 **Export Tools** - Data export functionality
+- 🔔 **Notification System** - Real-time alerts and updates
 
 ### 🛠️ Tech Stack
 
 - **Frontend**: React 18, Vite
 - **Styling**: Tailwind CSS
 - **Charts**: Recharts
+- **Testing**: Jest, React Testing Library, @testing-library/user-event
 - **Build Tool**: Vite
 - **Package Manager**: npm
 
@@ -40,36 +44,82 @@ npm run dev
 ### 🚀 Scripts
 
 ```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run preview  # Preview production build
-npm run cleanup  # Kill ports (5173, 5175)
+npm run dev           # Start development server
+npm run build         # Build for production
+npm run preview       # Preview production build
+npm run cleanup       # Kill ports (5173, 5175)
+npm test              # Run all tests
+npm run test:watch    # Run tests in watch mode
+npm run test:coverage # Generate test coverage report
 ```
 
 ### 🏗️ Project Structure
 
 ```text
 src/
-├── EventPreviewDashboard.jsx    # Main dashboard component
-├── utils/
-│   └── gtu-helpers.js          # Helper functions and utilities
-├── main.jsx                    # Application entry point
-└── index.css                   # Tailwind CSS imports
+├── components/
+│   ├── __tests__/                    # Test files
+│   │   ├── ErrorBoundary.test.jsx
+│   │   ├── LoadingSpinner.test.jsx
+│   │   ├── ErrorMessage.test.jsx
+│   │   └── EnhancedEventDashboard.test.jsx
+│   ├── EnhancedEventDashboard.jsx    # Main dashboard component
+│   ├── ErrorBoundary.jsx             # Global error handling
+│   ├── LoadingSpinner.jsx            # Loading states
+│   ├── ErrorMessage.jsx              # Error display component
+│   ├── EventAnalytics.jsx            # Analytics charts
+│   ├── ExportTools.jsx               # Data export functionality
+│   └── NotificationSystem.jsx        # Real-time notifications
+├── main.jsx                          # Application entry point
+├── setupTests.js                     # Test configuration
+└── index.css                         # Global styles
+
+config/
+├── jest.config.cjs                   # Jest configuration
+├── babel.config.cjs                  # Babel configuration
+├── tailwind.config.js                # Tailwind CSS configuration
+└── vite.config.js                    # Vite configuration
 
 public/
-└── index.html                  # HTML template
+└── index.html                        # HTML template
 ```
 
-### 🔧 Helper Functions
+### 🧪 Testing
 
-The `gtu-helpers.js` module provides essential utilities:
+The project includes comprehensive test coverage with Jest and React Testing Library:
 
-- `normalizeTrainingType()` - Categorizes training programs
-- `getEnrolledStudents()` - Fetches enrollment data
-- `calculateCapacityMetrics()` - Computes capacity analytics
-- `getDangerZoneStatus()` - Retrieves event risk status
-- `summarizeInstruments()` - Analyzes equipment orders
-- `formatEventDate()` - Formats dates for display
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+```
+
+#### Test Coverage
+- **ErrorBoundary**: Error catching, retry functionality, UI fallbacks
+- **LoadingSpinner**: Different sizes, fullscreen mode, custom messages  
+- **ErrorMessage**: Error types, retry/dismiss actions, custom styling
+- **EnhancedEventDashboard**: Loading states, view toggling, filtering
+
+### 🛡️ Error Handling
+
+The application includes robust error handling at multiple levels:
+
+#### Global Error Boundary
+- Catches JavaScript errors anywhere in the component tree
+- Displays user-friendly error messages
+- Provides retry functionality
+- Logs errors for debugging
+
+#### Component-Level Error Handling
+- Loading states for async operations
+- Error messages with contextual information
+- Retry mechanisms for failed operations
+- Graceful degradation for missing data
 
 ### 🎨 Styling
 
