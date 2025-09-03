@@ -7,11 +7,13 @@ import {
   getDangerZoneStatus 
 } from '../utils/event-utils.js';
 import { handleKeyboardActivation, announceToScreenReader } from '../utils/accessibility.js';
+import EventService from '../services/api.js';
 import EventAnalytics from './EventAnalytics.jsx';
 import ExportTools from './ExportTools.jsx';
 import NotificationSystem from './NotificationSystem.jsx';
 import LoadingSpinner from './LoadingSpinner.jsx';
 import ErrorMessage from './ErrorMessage.jsx';
+import DangerZone from './DangerZone.jsx';
 
 // Mock data for demonstration
 const mockEvents = [
@@ -244,35 +246,50 @@ export default function EnhancedEventDashboard() {
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showDangerZone, setShowDangerZone] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [eventService] = useState(() => new EventService());
 
-  // Simulate data loading with error handling
+  // Load events from API service
   useEffect(() => {
     const loadEvents = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Use the new EventService to get enhanced event data
+        const enhancedEvents = await eventService.getEnhancedEvents();
         
-        // Simulate potential API error (uncomment to test error handling)
-        // if (Math.random() < 0.1) {
-        //   throw new Error('Failed to load events from server');
-        // }
+        // Transform the data to match our existing component structure
+        const transformedEvents = enhancedEvents.map(event => ({
+          id: event.id,
+          title: event.title,
+          date: event.meta?.event_date || event.date,
+          location: event.meta?.location || event.location,
+          instructor: event.meta?.instructor || event.instructor,
+          enrolled: event.enrolled,
+          capacity: event.capacity,
+          status: event.status,
+          instruments: event.meta?.instruments || ['GT1', 'GT2'],
+          dangerZone: event.dangerZone,
+          recentActivity: event.recentActivity
+        }));
         
-        setEvents(mockEvents);
+        setEvents(transformedEvents);
       } catch (err) {
         setError(err.message || 'Failed to load events');
         console.error('Error loading events:', err);
+        
+        // Fallback to mock data if API fails
+        setEvents(mockEvents);
       } finally {
         setLoading(false);
       }
     };
 
     loadEvents();
-  }, []);
+  }, [eventService]);
 
   const retryLoading = () => {
     const loadEvents = async () => {
@@ -303,7 +320,15 @@ export default function EnhancedEventDashboard() {
   const handleViewToggle = () => {
     const newView = !showAnalytics;
     setShowAnalytics(newView);
+    setShowDangerZone(false); // Close danger zone when switching to analytics
     announceToScreenReader(`Switched to ${newView ? 'analytics' : 'list'} view`);
+  };
+
+  const handleDangerZoneToggle = () => {
+    const newView = !showDangerZone;
+    setShowDangerZone(newView);
+    setShowAnalytics(false); // Close analytics when switching to danger zone
+    announceToScreenReader(`${newView ? 'Opened' : 'Closed'} danger zone risk intelligence`);
   };
 
   // Show loading spinner
@@ -551,7 +576,7 @@ export default function EnhancedEventDashboard() {
                 marginBottom: '4px'
               }}
             >
-              View Mode
+              Analytics
             </label>
             <button
               onClick={handleViewToggle}
@@ -592,6 +617,52 @@ export default function EnhancedEventDashboard() {
             >
               Toggle between list view and analytics dashboard
             </div>
+
+            {/* Danger Zone Toggle */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <label 
+                id="danger-zone-label"
+                style={{ 
+                  fontSize: '0.875rem', 
+                  fontWeight: '500', 
+                  color: '#374151',
+                  marginBottom: '4px'
+                }}
+              >
+                Risk Intelligence
+              </label>
+              <button
+                onClick={handleDangerZoneToggle}
+                onKeyDown={(e) => handleKeyboardActivation(e, handleDangerZoneToggle)}
+                aria-labelledby="danger-zone-label"
+                aria-pressed={showDangerZone}
+                aria-describedby="danger-zone-help"
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: showDangerZone ? '#dc2626' : '#f3f4f6',
+                  color: showDangerZone ? 'white' : '#374151',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <span role="img" aria-label="Warning">⚠️</span> Danger Zone
+              </button>
+              <div 
+                id="danger-zone-help" 
+                style={{ 
+                  fontSize: '0.75rem', 
+                  color: '#6b7280', 
+                  marginTop: '2px',
+                  display: 'none'
+                }}
+              >
+                Risk assessment and early warning system
+              </div>
+            </div>
           </div>
         </section>
 
@@ -616,7 +687,15 @@ export default function EnhancedEventDashboard() {
           </section>
         )}
 
+        {/* Danger Zone View */}
+        {showDangerZone && (
+          <section aria-labelledby="danger-zone-heading">
+            <DangerZone events={filteredEvents} />
+          </section>
+        )}
+
         {/* Events List */}
+        {!showAnalytics && !showDangerZone && (
         <section aria-labelledby="events-heading">
           <h2 
             id="events-heading"
@@ -657,6 +736,7 @@ export default function EnhancedEventDashboard() {
             </div>
           )}
         </section>
+        )}
       </main>
     </div>
   );
