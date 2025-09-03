@@ -1,10 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-// import './index.css'  // Temporarily disabled for testing
-import EventPreviewDashboard from './EventPreviewDashboard.jsx'
+import EnhancedEventDashboard from './components/EnhancedEventDashboard.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <EventPreviewDashboard />
+    <EnhancedEventDashboard />
   </React.StrictMode>
 )
