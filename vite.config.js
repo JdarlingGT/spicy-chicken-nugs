@@ -7,7 +7,13 @@ export default defineConfig({
     'process.env': {}, // avoids issues with some packages expecting Node env
   },
   server: {
-    port: 5173,
-    open: true,
+    port: 12000,
+    host: '0.0.0.0',
+    open: false,
+    cors: true,
+    allowedHosts: ['work-1-fmrtwonpbmmiscxz.prod-runtime.all-hands.dev'],
+    headers: {
+      'X-Frame-Options': 'ALLOWALL',
+    },
   },
 });
