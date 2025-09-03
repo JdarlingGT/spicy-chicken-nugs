@@ -6,6 +6,17 @@ export default defineConfig({
   define: {
     'process.env': {}, // avoids issues with some packages expecting Node env
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          charts: ['recharts'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000, // Increase limit temporarily while we optimize
+  },
   server: {
     port: 12000,
     host: '0.0.0.0',
